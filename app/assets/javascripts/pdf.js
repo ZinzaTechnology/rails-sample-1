@@ -1,0 +1,10 @@
+// PDF only
+//= require jquery
+//= require rails-ujs
+//= require_tree ./lib/common
+//= require bootstrap-datetimepicker
+//= require bootstrap-sprockets
+//= require select2
+//= require cocoon
+//= require moment
+//= require daterangepicker

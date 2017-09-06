@@ -1,0 +1,13 @@
+// Avoid overlapping table header when export pdf - START
+thead, tfoot {
+  display: table-row-group;
+}
+
+tr {
+  page-break-inside: avoid;
+}
+// Avoid overlapping table header when export pdf - END
+
+.page-break {
+  page-break-after: always;
+}

@@ -1,0 +1,46 @@
+cache: &global_cache
+  key:
+    files:
+      - Gemfile.lock
+  paths:
+    - vendor/bundler
+
+stages:
+  - rspec
+services:
+  - docker:dind
+  - mysql:5.7
+  - redis:5.0.9
+  - mailhog/mailhog:latest
+
+rspec:
+  image: ruby:2.5.1
+  cache:
+    <<: *global_cache
+  stage: rspec
+  variables:
+    MYSQL_USER: dbuser
+    MYSQL_PASSWORD: dbpass
+    MYSQL_ROOT_PASSWORD: dbpass
+    MYSQL_DATABASE: test_db
+    HOST: localhost
+    PORT: 3000
+    DB_USER: root
+    DB_PASSWORD: dbpass
+    DB_HOST: 127.0.0.1
+    DB_PORT: 3306
+    DOMAIN: http://localhost:3000
+    MAILER_SENDER_ADDRESS: noreply@example.com
+    RAILS_ENV: test
+    AWS_REGION: ap-northeast-1
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq nodejs
+    - gem install bundler --no-ri --no-rdoc
+    - bundle install --jobs $(nproc) --path=vendor/bundler "${FLAGS[@]}"
+    - chmod +x ./docker/web/wait-for-it.sh
+  script:
+    - ./docker/web/wait-for-it.sh localhost:3306
+    - bundle exec rake db:test:prepare
+    - bundle exec rubocop
+    - bundle exec rspec
+    - bundle exec brakeman
